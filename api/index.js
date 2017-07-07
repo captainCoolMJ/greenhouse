@@ -248,28 +248,48 @@ router.route('/:latlong/weather')
 
 router.route('/configure')
 	.post(function (req, res) {
-
 		var body = req.body;
 
-		console.log(body);
+		var tfHour = 0;
+		var tfMin = 0;
 
-		if (body['day-all'] === 'all') {
-			body['day-select'] = '*';
-		} else if (body['day-select'] && body['day-select'].length) {
-			body['day-select'] = body['day-select'].join(',');
+		var ttHour = 23;
+		var ttMin = 59
+
+		var mnRange = 0;
+		var hrRange = 0;
+
+		if (body['temp-day-all'] === 'all') {
+			body['temp-day-select'] = '*';
+		} else if (body['temp-day-select'] && body['temp-day-select'].length) {
+			body['temp-day-select'] = body['temp-day-select'].join(',');
+		} else if (body['temp-day-select']) {
+			body['temp-day-select'] = [body['temp-day-select']];
 		} else {
-			body['day-select'] = '*';
+			body['temp-day-select'] = '*';
 		}
 
-		// date.getMinutes(),
-		// 		date.getHours(),
-		// 		date.getDate(),
-		// 		date.getMonth(),
-		// 		date.getDay()
+		if (body['temp-time-from']) {
+			tfHour = parseInt(body['temp-time-from'].substr(0, 2));
+			tfMin = parseInt(body['temp-time-from'].slice(-2));
+		}
 
-		var str = ['*', '*', '*', '*', body['day-select']].join(' ');
+		if (body['temp-time-to']) {
+			ttHour = parseInt(body['temp-time-to'].substr(0, 2));
+			ttMin = parseInt(body['temp-time-to'].slice(-2));
+		}
 
-		parts.temperature.schedule.list[str] = 100;
+		if (ttHour !== tfHour) {
+			hrRange = [tfHour, ttHour].join('-');
+		}
+
+		if (ttMin !== ttMin) {
+			mnRange = [tfMin, ttHour].join('-');
+		}
+
+		var str = [mnRange, hrRange, '*', '*', body['temp-day-select']].join(' ');
+
+		parts.temperature.schedule.list[str] = body['temp'];
 
 		res.json({
 			success: true
