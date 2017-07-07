@@ -1,0 +1,23 @@
+.range-slider {
+    margin: 1em 0 1.5em 0;
+    border-radius: 0;
+    height: 3em;
+}
+.range-slider.range-slider.range-slider.range-slider span {
+    height: auto;
+    top: -3px;
+    bottom: -3px;
+    width: 1em;
+    margin-left: -.5em;
+    opacity: .8;
+    outline: none;
+    cursor: ew-resize;
+}
+.range-slider i {
+    position: absolute;
+    font-style: normal;
+    top: 100%;
+    left: 50%;
+    color: #454545 !important;
+    transform: translateX(-50%);
+}

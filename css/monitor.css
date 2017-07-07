@@ -5,10 +5,6 @@
     width: 900px;
 }
 
-.graph {
-    
-}
-
 #slider {
     position: absolute;
     top: 0;
@@ -22,7 +18,8 @@
 }
 #slider span {
     height: auto;
-    bottom: -3em;
+    top: -3px;
+    bottom: -3px;
     width: 1em;
     margin-left: -.5em;
     opacity: .8;

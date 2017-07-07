@@ -5,7 +5,8 @@
 	<title>Document</title>
 
 	<link rel="stylesheet" type="text/css" href="vendor/bootstrap/css/bootstrap.css">
-
+	<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+	<link rel="stylesheet" href="./css/range-slider.css">
 	<style>
 		.search {
 			position: relative;
@@ -27,7 +28,7 @@
 	</style>
 </head>
 <body>
-	
+	<div class="container">
 	<form id="temperature-form">
 		<h3>Temperature</h3>
 		
@@ -36,24 +37,9 @@
 			<h4>Time</h4>
 
 			<label>From</label>
-			<select name="time-from">
-				<option value="0000">00:00</option>
-				<option value="0100">01:00</option>
-				<option value="0200">02:00</option>
-				<option value="0300">03:00</option>
-				<option value="0400">04:00</option>
-				<option value="0500">05:00</option>
-			</select>
-			
-			<label>To</label>
-			<select name="time-to">
-				<option value="0000">00:00</option>
-				<option value="0100">01:00</option>
-				<option value="0200">02:00</option>
-				<option value="0300">03:00</option>
-				<option value="0400">04:00</option>
-				<option value="0500">05:00</option>
-			</select>
+			<div id="time-range" class="range-slider"></div>
+			<input type="hidden" name="time-from" id="time-range-from">
+			<input type="hidden" name="time-to" id="time-range-to">
 
 			<label>Set to</label>
 			<select name="temp">
@@ -122,10 +108,11 @@
 
 		<input type="submit" class="btn" value="save" />
 	</form>
-
+	</div>
 	<script src="https://code.jquery.com/jquery-3.2.1.js"></script>
 	<!-- <script type="text/javascript" src="vendor/bootstrap/js/bootstrap.js"></script> -->
-
+	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+	<script src="./js/range-slider.js"></script>
 	<script>
 	var $tempForm = $('#temperature-form');
 
