@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+
+	<link rel="stylesheet" type="text/css" href="vendor/bootstrap/css/bootstrap.css">
+
+	<style>
+		.search {
+			position: relative;
+		}
+
+		.search__results {
+			display: block;
+			list-style: none;
+			box-shadow: 0 0 4px 0 rgba(0,0,0,0.25);
+		}
+
+		.search__select {
+			display: block;
+			padding-top: 0.5em;
+			padding-bottom: 0.5em;
+		}
+
+		/*.search__*/
+	</style>
+</head>
+<body>
+	
+	<form id="temperature-form">
+		<h3>Temperature</h3>
+		
+		
+
+
+		<h4>Repeats</h4>
+
+		<p>
+			<label>
+				Every Day
+				<input type="checkbox" name="all-select" value="all" />
+			</label>
+		</p>
+		<ul>
+			<li>
+				<label>
+					Sunday
+					<input type="checkbox" name="day-select" value="0">
+				</label>
+			</li>
+			<li>
+				<label>
+					Monday
+					<input type="checkbox" name="day-select" value="1">
+				</label>
+			</li>
+			<li>
+				<label>
+					Tuesday
+					<input type="checkbox" name="day-select" value="2">
+				</label>
+			</li>
+			<li>
+				<label>
+					Wednesday
+					<input type="checkbox" name="day-select" value="3">
+				</label>
+			</li>
+			<li>
+				<label>
+					Thursday
+					<input type="checkbox" name="day-select" value="4">
+				</label>
+			</li>
+			<li>
+				<label>
+					Friday
+					<input type="checkbox" name="day-select" value="5">
+				</label>
+			</li>
+			<li>
+				<label>
+					Saturday
+					<input type="checkbox" name="day-select" value="6">
+				</label>
+			</li>
+		</ul>
+
+		<input type="submit" class="btn" value="save" />
+	</form>
+
+	<script src="https://code.jquery.com/jquery-3.2.1.js"></script>
+	<!-- <script type="text/javascript" src="vendor/bootstrap/js/bootstrap.js"></script> -->
+
+	<script>
+
+	var $tempForm = $('#temperature-form');
+
+	$tempForm.on('submit', function (evt) {
+		evt.preventDefault();
+
+		$.post('http://localhost:8888/api/configure', $tempForm.serialize());
+		// console.log($form.serialize())
+
+		// $.post()
+	})
+
+	</script>
+</body>
+</html>

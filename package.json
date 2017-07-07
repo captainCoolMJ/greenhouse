@@ -1,0 +1,12 @@
+{
+  "name": "greenhouse-api",
+  "main": "api/server.js",
+  "dependencies": {
+    "body-parser": "~1.0.1",
+    "cors": "^2.8.3",
+    "cron": "^1.2.1",
+    "cron-converter": "0.0.11",
+    "express": "~4.0.0",
+    "mongoose": "~3.6.13"
+  }
+}
