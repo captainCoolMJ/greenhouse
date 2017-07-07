@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+
+	<link rel="stylesheet" type="text/css" href="vendor/bootstrap/css/bootstrap.css">
+
+	<style>
+		.search {
+			position: relative;
+		}
+
+		.search__results {
+			display: block;
+			list-style: none;
+			box-shadow: 0 0 4px 0 rgba(0,0,0,0.25);
+		}
+
+		.search__select {
+			display: block;
+			padding-top: 0.5em;
+			padding-bottom: 0.5em;
+		}
+
+		/*.search__*/
+	</style>
+</head>
+<body>
+	<div class="search">
+		<h1 class="search__title">Find a City</h1>
+
+		<input class="search__input" type="search" />
+
+		<table class="table table-striped search__results">
+			<tr class="search__result row-fluid">
+				<td class="span8">
+					<a href="#" class="search__select">Dubai Marina, UAE - 42<sup>&deg;</sup></a>
+				</td>
+				<td class="span4">
+					42<sup>&deg;</sup>
+				</td>
+			</tr>
+			<tr class="search__result row-fluid">
+				<td class="span8">
+					Dubai Marina, UAE
+				</td>
+				<td class="span4">
+					21<sup>&deg;</sup>
+				</td>
+			</tr>
+		</table>
+	</div>
+
+	<div class="selection">
+		<h2>Dubai</h2>
+
+		<p>42<sup>&deg;</sup></p>
+		<p>Sunrise: 06:42</p>
+		<p>Sunset: 19:05</p>
+		<p>Humidity: 75%</p>
+	</div>
+	
+	<form>
+		<input type="hidden" name="location-id" value="" />
+		<button type="submit" class="btn">Pair with This Location</button>
+	</form>
+
+	<script src="https://code.jquery.com/jquery-3.2.1.js"></script>
+	<script type="text/javascript" src="vendor/bootstrap/js/bootstrap.js"></script>
+</body>
+</html>
