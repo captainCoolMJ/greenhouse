@@ -31,7 +31,40 @@
 	<form id="temperature-form">
 		<h3>Temperature</h3>
 		
-		
+		<div>
+
+			<h4>Time</h4>
+
+			<label>From</label>
+			<select name="time-from">
+				<option value="0000">00:00</option>
+				<option value="0100">01:00</option>
+				<option value="0200">02:00</option>
+				<option value="0300">03:00</option>
+				<option value="0400">04:00</option>
+				<option value="0500">05:00</option>
+			</select>
+			
+			<label>To</label>
+			<select name="time-to">
+				<option value="0000">00:00</option>
+				<option value="0100">01:00</option>
+				<option value="0200">02:00</option>
+				<option value="0300">03:00</option>
+				<option value="0400">04:00</option>
+				<option value="0500">05:00</option>
+			</select>
+
+			<label>Set to</label>
+			<select name="temp">
+				<option value="18">18&deg;</option>
+				<option value="19">19&deg;</option>
+				<option value="20">20&deg;</option>
+				<option value="21">21&deg;</option>
+				<option value="22">22&deg;</option>
+				<option value="23">23&deg;</option>
+			</select>
+		</div>
 
 
 		<h4>Repeats</h4>
@@ -94,7 +127,6 @@
 	<!-- <script type="text/javascript" src="vendor/bootstrap/js/bootstrap.js"></script> -->
 
 	<script>
-
 	var $tempForm = $('#temperature-form');
 
 	$tempForm.on('submit', function (evt) {

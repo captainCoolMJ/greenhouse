@@ -251,6 +251,8 @@ router.route('/configure')
 
 		var body = req.body;
 
+		console.log(body);
+
 		if (body['day-all'] === 'all') {
 			body['day-select'] = '*';
 		} else if (body['day-select'] && body['day-select'].length) {
