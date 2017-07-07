@@ -24,7 +24,28 @@
 			padding-bottom: 0.5em;
 		}
 
-		/*.search__*/
+		.list-inline li {
+			display: inline-block;
+			min-width: 100px;
+		}
+
+		.button--push { text-align: center; }
+
+		.button--push input[type="checkbox"] { display: none; }
+		.button--push input[type="checkbox"] + label {
+			background-color: #FFF;
+			display: block;
+			padding: 0.25em;
+			border-radius: 2px;
+			border: 1px solid #E0E0E0;
+			cursor: pointer;
+			color: #222;
+		}
+
+		.button--push input[type="checkbox"]:checked + label {
+			background-color: #E0E0E0;
+			border-color: #B0B0B0;
+		}
 	</style>
 </head>
 <body>
@@ -38,8 +59,8 @@
 
 			<label>From</label>
 			<div id="time-range" class="range-slider"></div>
-			<input type="hidden" name="time-from" id="time-range-from">
-			<input type="hidden" name="time-to" id="time-range-to">
+			<input type="hidden" name="temp-time-from" id="time-range-from">
+			<input type="hidden" name="temp-time-to" id="time-range-to">
 
 			<label>Set to</label>
 			<select name="temp">
@@ -52,61 +73,60 @@
 			</select>
 		</div>
 
-
 		<h4>Repeats</h4>
 
-		<p>
-			<label>
-				Every Day
-				<input type="checkbox" name="all-select" value="all" />
-			</label>
-		</p>
-		<ul>
+		<ul class="list-unstyled list-inline">
 			<li>
-				<label>
-					Sunday
-					<input type="checkbox" name="day-select" value="0">
-				</label>
+				<div class="button button--push">
+					<input type="checkbox" id="all-select" name="temp-all-select" value="all" />
+					<label for="all-select">All</label>
+				</div>
 			</li>
 			<li>
-				<label>
-					Monday
-					<input type="checkbox" name="day-select" value="1">
-				</label>
+				<div class="button button--push">
+					<input type="checkbox" id="day-select-0" name="temp-day-select" value="0" />
+					<label for="day-select-0">S</label>
+				</div>
 			</li>
 			<li>
-				<label>
-					Tuesday
-					<input type="checkbox" name="day-select" value="2">
-				</label>
+				<div class="button button--push">
+					<input type="checkbox" id="day-select-1" name="temp-day-select" value="1" />
+					<label for="day-select-1">M</label>
+				</div>
 			</li>
 			<li>
-				<label>
-					Wednesday
-					<input type="checkbox" name="day-select" value="3">
-				</label>
+				<div class="button button--push">
+					<input type="checkbox" id="day-select-2" name="temp-day-select" value="2" />
+					<label for="day-select-2">T</label>
+				</div>
 			</li>
 			<li>
-				<label>
-					Thursday
-					<input type="checkbox" name="day-select" value="4">
-				</label>
+				<div class="button button--push">
+					<input type="checkbox" id="day-select-3" name="temp-day-select" value="3" />
+					<label for="day-select-3">W</label>
+				</div>
 			</li>
 			<li>
-				<label>
-					Friday
-					<input type="checkbox" name="day-select" value="5">
-				</label>
+				<div class="button button--push">
+					<input type="checkbox" id="day-select-4" name="temp-day-select" value="4" />
+					<label for="day-select-4">T</label>
+				</div>
 			</li>
 			<li>
-				<label>
-					Saturday
-					<input type="checkbox" name="day-select" value="6">
-				</label>
+				<div class="button button--push">
+					<input type="checkbox" id="day-select-5" name="temp-day-select" value="5" />
+					<label for="day-select-5">F</label>
+				</div>
+			</li>
+			<li>
+				<div class="button button--push">
+					<input type="checkbox" id="day-select-6" name="temp-day-select" value="6" />
+					<label for="day-select-6">S</label>
+				</div>
 			</li>
 		</ul>
 
-		<input type="submit" class="btn" value="save" />
+		<button type="submit" class="btn">Apply</button>
 	</form>
 	</div>
 	<script src="https://code.jquery.com/jquery-3.2.1.js"></script>
@@ -114,7 +134,59 @@
 	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 	<script src="./js/range-slider.js"></script>
 	<script>
+
+	var dayRepeat = {
+		$all: $('input[name="temp-all-select"]'),
+		$days: $('input[name="temp-day-select"]'),
+		days: $('input[name="temp-day-select"]').toArray().map(function (el, i) {
+			return {
+				el: el,
+				isChecked: $(el).is(':checked')
+			};
+		}),
+		set: function () {
+
+		},
+		renderHTML: function (action) {
+			if (action === 'days') {
+				dayRepeat.days.forEach(function (day) {
+					$(day.el).prop('checked', day.isChecked);
+				});
+			} else if (action === 'selectAll') {
+				dayRepeat.$all.prop('checked', dayRepeat.days.every(function (day) {
+					return day.isChecked;
+				}))
+			} else {}
+		},
+		initialize: function () {
+			dayRepeat.$all.on('change', function (evt) {
+				var el = this;
+				var isChecked = $(el).is(':checked');
+
+				dayRepeat.days.forEach(function (day) {
+					if (isChecked) {
+						day.isChecked = true;
+					}
+				});
+
+				dayRepeat.renderHTML('days');
+			});
+
+			dayRepeat.$days.on('change', function (evt) {
+				var el = this;
+
+				dayRepeat.days.forEach(function (day) {
+					day.isChecked = $(day.el).is(':checked');
+				});
+
+				dayRepeat.renderHTML('selectAll');
+			});
+		}
+	};
+
 	var $tempForm = $('#temperature-form');
+
+	dayRepeat.initialize();
 
 	$tempForm.on('submit', function (evt) {
 		evt.preventDefault();
