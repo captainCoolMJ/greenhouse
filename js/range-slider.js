@@ -1,6 +1,14 @@
 const rangeSlider = (selector) => {
     const initialValues = [ 5, 20 ]
 
+    this.toString = value => {
+        let postfix = (value > Math.floor(value) ? ':30' : ':00' )
+        if(Math.ceil(value) === 24) {
+            postfix = ':59'
+        }
+        return Math.floor(value) + postfix
+    }
+
     this.setSliderLabels = (fromValue, toValue) => {
         if(Array.isArray(fromValue)) {
             toValue = fromValue[1]
@@ -16,17 +24,18 @@ const rangeSlider = (selector) => {
     $(selector).slider({
         range: true,
         min: 0,
-        max: 23,
+        max: 23.9,
+        step: .5,
         values: initialValues,
         slide: ( event, ui ) => {
-            const fromValue = `${ui.values[0]}:00`
-            const toValue = `${ui.values[1]}:00`
+            const fromValue = this.toString(ui.values[0])
+            const toValue = this.toString(ui.values[1])
             this.setSliderLabels(fromValue, toValue)
             $(`${selector}-from`).val(fromValue)
             $(`${selector}-to`).val(toValue)
         }
     })
-    this.setSliderLabels(initialValues.map(item => item+':00'))
+    this.setSliderLabels(initialValues.map(item => this.toString(item)))
 }
 
 (function($) {
