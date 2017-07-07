@@ -1,0 +1,31 @@
+.box {
+    position: relative;
+    margin: 20px auto;
+    border: 1px solid #f0f0f0;
+    width: 900px;
+}
+
+.graph {
+    
+}
+
+#slider {
+    position: absolute;
+    top: 0;
+    left: 99px;
+    right: 99px;
+    bottom: 0;
+    height: auto;
+    background: transparent;
+    cursor: ew-resize;
+    border: none;
+}
+#slider span {
+    height: auto;
+    bottom: -3em;
+    width: 1em;
+    margin-left: -.5em;
+    opacity: .8;
+    outline: none;
+    cursor: ew-resize;
+}
