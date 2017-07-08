@@ -214,14 +214,21 @@ app.get('/subscribe', function (req, res) {
 
 router.route('/locations')
 	.get(function (req, res) {
-		res.json({
-			locations: [
-				{
-					name: "asdf",
-					country: "asdf",
-					id: 123
-				}
-			]
+		getJSON(`https://69433abe-5db8-462f-bf19-9e96fe3f6334:8EVKVhsBGD@twcservice.eu-gb.mybluemix.net/api/weather/v3/location/search?query=${req.query.query}&language=en-US`).then(function (response) {
+			var locations = [];
+
+			for (var i=0; i<response.location.address.length; i++) {
+				locations.push({
+					name: response.location.city[i],
+					latitude: response.location.latitude[i],
+					longitude: response.location.longitude[i],
+					id: response.location.placeId[i]
+				});
+			}
+
+			res.json({
+				locations: locations
+			});
 		})
 	});
 
@@ -261,6 +268,35 @@ router.route('/:latlong/weather')
 			console.log(e)
 		});
 	});
+
+router.route('/configureBulk')
+	.post(function (req, res) {
+
+		parts.temperature.schedule.list = {};
+
+		var today = new Date();
+
+		for (var i=0; i<req.body.forecast.length; i++) {
+			var date = new Date(req.body.forecast[i].time);
+
+			var cron = ['*', date.getHours(), '*', '*', '*'];
+
+			/*
+			date.setHours(i);
+			date.setMinutes(0);
+			date.setSeconds(0);
+			date.setMilliseconds(0);
+			 */
+
+			parts.temperature.schedule.list[cron.join(' ')] = req.body.forecast[i].temp;
+		}
+
+		res.json({
+			success: true
+		});
+	});
+
+// [{"time":"2017-07-08T03:00:00.000Z","temp":94,"humidity":60,"pop":0},{"time":"2017-07-08T04:00:00.000Z","temp":96,"humidity":56,"pop":0},{"time":"2017-07-08T05:00:00.000Z","temp":99,"humidity":47,"pop":0},{"time":"2017-07-08T06:00:00.000Z","temp":102,"humidity":43,"pop":0},{"time":"2017-07-08T07:00:00.000Z","temp":105,"humidity":37,"pop":0},{"time":"2017-07-08T08:00:00.000Z","temp":109,"humidity":31,"pop":0},{"time":"2017-07-08T09:00:00.000Z","temp":108,"humidity":38,"pop":0},{"time":"2017-07-08T10:00:00.000Z","temp":107,"humidity":39,"pop":0},{"time":"2017-07-08T11:00:00.000Z","temp":108,"humidity":38,"pop":0},{"time":"2017-07-08T12:00:00.000Z","temp":109,"humidity":35,"pop":0},{"time":"2017-07-08T13:00:00.000Z","temp":109,"humidity":35,"pop":0},{"time":"2017-07-08T14:00:00.000Z","temp":108,"humidity":36,"pop":0},{"time":"2017-07-08T15:00:00.000Z","temp":107,"humidity":37,"pop":0},{"time":"2017-07-08T16:00:00.000Z","temp":105,"humidity":39,"pop":0},{"time":"2017-07-08T17:00:00.000Z","temp":103,"humidity":41,"pop":0},{"time":"2017-07-08T18:00:00.000Z","temp":101,"humidity":43,"pop":0},{"time":"2017-07-08T19:00:00.000Z","temp":100,"humidity":45,"pop":0},{"time":"2017-07-08T20:00:00.000Z","temp":99,"humidity":47,"pop":0},{"time":"2017-07-08T21:00:00.000Z","temp":98,"humidity":53,"pop":0},{"time":"2017-07-08T22:00:00.000Z","temp":97,"humidity":54,"pop":0},{"time":"2017-07-08T23:00:00.000Z","temp":96,"humidity":57,"pop":1},{"time":"2017-07-09T00:00:00.000Z","temp":95,"humidity":60,"pop":2},{"time":"2017-07-09T01:00:00.000Z","temp":94,"humidity":64,"pop":3},{"time":"2017-07-09T02:00:00.000Z","temp":93,"humidity":67,"pop":3},{"time":"2017-07-09T03:00:00.000Z","temp":93,"humidity":66,"pop":2},{"time":"2017-07-09T04:00:00.000Z","temp":96,"humidity":59,"pop":0},{"time":"2017-07-09T05:00:00.000Z","temp":100,"humidity":46,"pop":0},{"time":"2017-07-09T06:00:00.000Z","temp":104,"humidity":35,"pop":0},{"time":"2017-07-09T07:00:00.000Z","temp":108,"humidity":30,"pop":0},{"time":"2017-07-09T08:00:00.000Z","temp":109,"humidity":27,"pop":0},{"time":"2017-07-09T09:00:00.000Z","temp":108,"humidity":33,"pop":0},{"time":"2017-07-09T10:00:00.000Z","temp":107,"humidity":38,"pop":0},{"time":"2017-07-09T11:00:00.000Z","temp":106,"humidity":40,"pop":0},{"time":"2017-07-09T12:00:00.000Z","temp":105,"humidity":40,"pop":0},{"time":"2017-07-09T13:00:00.000Z","temp":104,"humidity":42,"pop":0},{"time":"2017-07-09T14:00:00.000Z","temp":103,"humidity":44,"pop":0},{"time":"2017-07-09T15:00:00.000Z","temp":101,"humidity":44,"pop":0},{"time":"2017-07-09T16:00:00.000Z","temp":101,"humidity":44,"pop":0},{"time":"2017-07-09T17:00:00.000Z","temp":101,"humidity":42,"pop":0},{"time":"2017-07-09T18:00:00.000Z","temp":101,"humidity":41,"pop":0},{"time":"2017-07-09T19:00:00.000Z","temp":100,"humidity":41,"pop":0},{"time":"2017-07-09T20:00:00.000Z","temp":99,"humidity":41,"pop":0},{"time":"2017-07-09T21:00:00.000Z","temp":98,"humidity":44,"pop":0},{"time":"2017-07-09T22:00:00.000Z","temp":97,"humidity":46,"pop":0},{"time":"2017-07-09T23:00:00.000Z","temp":96,"humidity":47,"pop":0},{"time":"2017-07-10T00:00:00.000Z","temp":95,"humidity":50,"pop":1},{"time":"2017-07-10T01:00:00.000Z","temp":94,"humidity":51,"pop":1},{"time":"2017-07-10T02:00:00.000Z","temp":94,"humidity":52,"pop":0}],"meta":{"location":{}}}
 
 router.route('/configure')
 	.get(function (req, res) {

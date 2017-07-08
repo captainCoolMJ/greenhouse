@@ -72,21 +72,16 @@
 		</div>
 
 		<div class="selection">
-			<h2>Dubai</h2>
-
-			<p>42<sup>&deg;</sup></p>
-			<!-- <p>Sunrise: 06:42</p>
-			<p>Sunset: 19:05</p>
-			<p>Humidity: 75%</p> -->
 		</div>
 		
-		<form>
+		<form id="pair-form">
 			<input type="hidden" name="location-id" value="" />
 			<button type="submit" class="btn btn-default">Pair with This Location</button>
 		</form>
 	</div>
 
 	<script src="https://code.jquery.com/jquery-3.2.1.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.js"></script>
 
 	<script>
 
@@ -101,70 +96,170 @@
 			clearTimeout(search._searchDebounce);
 
 			search.results = {};
-			search.renderHTML();
-			search.$resultsContainer.show();
+			search.renderHTML('search');
+			search.renderHTML('show');
 
 			search._searchDebounce = setTimeout(function () {
-				search.results = {
-					'1234': {
-						id: '1234',
-						name: 'asdfg',
-						'temperature': '30'
-					}
-				};
-
-				search.renderHTML();
+				$.get('http://localhost:8888/api/locations', {
+					query: search.$input.val()
+				}, function (res) {
+					res.locations.forEach(function (location) {
+						search.results[location.id] = location;
+					});
+					search.renderHTML('search');
+				})
 			}, 500)
 		},
 		onSelect: function (locationId) {
 			selection.setSelection(search.results[locationId]);
+
+			search.$input.val(search.results[locationId].name);
 			search.$resultsContainer.hide();
 		},
-		renderHTML: function () {
-			search.$resultsContainer.empty();
+		renderHTML: function (action) {
+			switch (action) {
+				case 'search':
+					search.$resultsContainer.empty();
 
-			for (var prop in search.results) {
-				var $res = search.tpl.clone();
+					for (var prop in search.results) {
+						var $res = search.tpl.clone();
 
-				$('a', $res)
-					.data('location-id', search.results[prop].id)
-					.text(search.results[prop].name);
+						$('a', $res)
+							.data('location-id', search.results[prop].id)
+							.text(search.results[prop].name);
 
-				search.$resultsContainer.append($res);
-			}
+						search.$resultsContainer.append($res);
+					}
+					break;
+				case 'hide':
+					search.$resultsContainer.hide();
+					break;
+				case 'show':
+					search.$resultsContainer.show();
+					break;
+				default:
+					break;
+			} 
 		},
 		initialize: function () {
 			search.$resultsContainer.on('click', '.search__select', function (evt) {
 				evt.stopPropagation();
 				evt.preventDefault();
 
-				search.onSelect($(evt.target).data('locationId'))
+				search.onSelect($(evt.target).data('locationId'));
 			});
 
 			search.$input.on('keyup', function () {
 				search.onSearch(search.$input.val());
 			});
-			
-			search.$resultsContainer.hide();
+
+			search.renderHTML('hide');
 		}
 	};
 
 	var selection = {
+		$form: $("#pair-form"),
 		$container: $('.selection'),
+		$tpl: $('<div><h2></h2> <ul></ul></div>'),
 		value: {},
 		setSelection: function (data) {
 			selection.value = data;
 
-			selection.renderHTML();
+			$.get('http://localhost:8888/api/' + [data.latitude, data.longitude].join(',') + '/weather').then(function (response) {
+				selection.value.sunrise = moment(response.sunrise).format('h:mm:ss a');
+				selection.value.sunset = moment(response.sunset).format('h:mm:ss a');
+
+				selection.value.forecast = response.hours;
+
+				selection.renderHTML();
+			});
+		},
+		onSubmit: function () {
+			selection.$form.on("submit", function (evt) {
+				evt.preventDefault();
+				evt.stopPropagation();
+
+				window.alert('submit!');
+
+/*
+></div>
+<input type="hidden" name="temp-time-from" id="time-range-from">
+<input type="hidden" name="temp-time-to" id="time-range-to">
+</div>
+
+<div class="col-3">
+<label>Set to</label>
+<select name="temp">
+<option value="18">18&deg;</option>
+<option value="19">19&deg;</option>
+<option value="20">20&deg;</option>
+<option value="21">21&deg;</option>
+<option value="22">22&deg;</option>
+<option value="23">23&deg;</option>	
+ */
+				// $.post('http://localhost:8888/api/configureBulk', {
+				// 	forecast: selection.value.forecast
+				// }).then(function () {
+				// 	window.location.href = "http://localhost:8888/"
+				// });
+			});
 		},
 		renderHTML: function () {
-			var $title = $('h2', selection.$container);
+			selection.$container.empty();
+
+			var $sel = selection.$tpl.clone();
+			var $title = $('h2', $sel);
+			var $ul = $('ul', $sel);
+
+			selection.value.forecast.forEach(function (hour, i) {
+				if (i > 12) {
+					return;
+				}
+
+				var $li = $('<li />');
+				$li.text(moment(hour.time).format('h:mm:ss a') + ' - ' + hour.temp + 'º');
+				$ul.append($li);
+			});
 
 			$title.text(selection.value.name);
+
+			selection.$container.append($sel);
+		},
+		initialize: function () {
+			selection.$container.empty();
+
+			selection.$form.on("submit", function (evt) {
+				evt.preventDefault();
+				evt.stopPropagation();
+
+/*
+></div>
+<input type="hidden" name="temp-time-from" id="time-range-from">
+<input type="hidden" name="temp-time-to" id="time-range-to">
+</div>
+
+<div class="col-3">
+<label>Set to</label>
+<select name="temp">
+<option value="18">18&deg;</option>
+<option value="19">19&deg;</option>
+<option value="20">20&deg;</option>
+<option value="21">21&deg;</option>
+<option value="22">22&deg;</option>
+<option value="23">23&deg;</option>	
+ */
+
+				$.post('http://localhost:8888/api/configureBulk', {
+					forecast: selection.value.forecast
+				}).then(function () {
+					window.location.href = "http://localhost:8888/"
+				});
+			});
 		}
 	};
 
 	search.initialize();
+	selection.initialize();
 
 	</script>
 </body>
