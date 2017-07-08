@@ -66,12 +66,16 @@
 			margin: 0 auto;
 		}
 
+		.form-control {
+			margin: 2em 0;
+		}
+
 	</style>
 </head>
 <body>
 	<div class="container-fluid app__wrapper">
 		<h1>Manual Setup</h1>
-		<p class="lead">Configure a custom climate cycle to grow a plant as you see fit.</p>
+		<p class="lead">Configure a custom environment.</p>
 
 		<form id="temperature-form">
 			<h3>Temperature</h3>
@@ -149,9 +153,17 @@
 					</div>
 				</li>
 				<li class="span3">
-					<button type="submit" class="btn btn-default">Apply and Begin</button>
+					<button type="submit" class="btn btn-default">Start</button>
 				</li>
 			</ul>
+
+			<div class="form-control form-inline">
+				<label>
+					<strong>Or Import from a URL: </strong>
+					<input class="inline" type="url" placeholder="https://greenhouse.io/community/feeds/habanero-pepper.json" />
+				</label>
+				<button class="btn btn-default">Import</button>
+			</div>
 
 			<p><a href="/" type="submit" class="btn btn-link">Go Back</a></p>
 		</form>
