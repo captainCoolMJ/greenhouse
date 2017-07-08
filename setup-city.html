@@ -70,6 +70,15 @@
 			list-style: none;
 		}
 
+		.app__wrapper {
+			max-width: 500px;
+		}
+
+		.loading {
+			padding: 1em 0;
+			display: block;
+		}
+
 		/*.form .btn {
 			margin: 1em 0;
 		}*/
@@ -80,27 +89,23 @@
 <body>
 	<div class="container-fluid app__wrapper">
 		<div class="search">
-			<h1 class="search__title">Sync to a City</h1>
+			<h1 class="search__title">Sync with a City</h1>
 
-			<p class="lead">Find and sync with any city in the world to match your box to its climate.</p>
+			<p class="lead">Find and sync with any city in the world to match your greenhouse to its climate.</p>
 			
 			<input class="search__input" type="search" placeholder="e.g. Barcelona, Spain" />
 
-			<ul class="search__results"></ul>
+			<ul class="search__results" style="display: none;"></ul>
+		</div>
+
+		<div class="selection" style="display: none;">
+			<span class="loading">Loading...</span>
 		</div>
 
 		<form id="pair-form" class="form">
 			<input type="hidden" name="location-id" value="" />
 			<button type="submit" class="btn btn-default" disabled>Apply and Begin</button>
 		</form>
-
-		<div class="selection">
-		<div>
-			<h2>Barcelona</h2>
-			<p><strong>Sunrise</strong>: <span class="sunrise">05:00</span></p>
-			<p><strong>Sunset</strong>: <span class="sunset">19:44</span></p>
-			<ul><li>10:00:00 am - 26º</li><li>11:00:00 am - 26º</li><li>12:00:00 pm - 27º</li><li>1:00:00 pm - 28º</li><li>2:00:00 pm - 27º</li><li>3:00:00 pm - 26º</li><li>4:00:00 pm - 27º</li><li>5:00:00 pm - 27º</li><li>6:00:00 pm - 27º</li><li>7:00:00 pm - 27º</li><li>8:00:00 pm - 26º</li><li>9:00:00 pm - 26º</li><li>10:00:00 pm - 25º</li></ul></div>
-		</div>
 		
 		<p><a href="/" type="submit" class="btn btn-link">Go Back</a></p>
 	</div>
@@ -192,13 +197,15 @@
 				<p><strong>Sunrise: </strong> <span class="sunrise"></span></p>
 				<p><strong>Sunset: </strong> <span class="sunset"></span></p>
 
-				<h3>Today's Forecast</h3>
+				<h3>Today's Temperatures</h3>
 				<ul></ul>
 			</div>
 		`),
 		value: {},
 		setSelection: function (data) {
 			selection.value = data;
+
+			selection.$container.show();
 
 			$.get('http://localhost:8888/api/' + [data.latitude, data.longitude].join(',') + '/weather').then(function (response) {
 				selection.value._raw = response;
@@ -237,7 +244,7 @@
 			selection.$container.append($sel);
 		},
 		initialize: function () {
-			selection.$container.empty();
+			// selection.$container.empty();
 			selection.$btnSubmit.prop('disabled', true);
 
 			selection.$form.on("submit", function (evt) {
