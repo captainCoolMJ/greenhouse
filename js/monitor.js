@@ -210,6 +210,7 @@ class GreenhouseMonitor {
                 var chart = new google.visualization.LineChart(node);
 
                 chart.draw(data, options);
+                this.updateMark();
             },
             getValue: pos => {
                 if(!this.internalData.temperature) {
@@ -294,9 +295,9 @@ class GreenhouseMonitor {
                 percentage = $(this.sliderSelector).slider('value')
             }
             let data
-            const pos = util.transformRanges(percentage, [0, 100], [0, 23])
+            let pos = util.transformRanges(percentage, [0, 100], [0, 23])
             if(!pos) {
-                return
+                pos = (new Date()).getHours()
             }
 
             data = this.tempGraph.getValue(pos)
@@ -323,7 +324,7 @@ class GreenhouseMonitor {
                     }
                 });
             },
-            getValue() {
+            getValue: () => {
                 return $(this.sliderSelector).slider('value')
             },
             onSliderChange: percentage => {
