@@ -2,7 +2,8 @@ var express = require('express');
 var app = express();
 var cors = require('cors')
 var bodyParser = require('body-parser');
-var http = require('https')
+var http = require('https');
+var path = require('path');
 var server = require('http').Server(app);
 var socketio = require('socket.io');
 
@@ -12,6 +13,10 @@ var cronInstance = new (require('cron-converter'))();
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+
+app.use('/css', express.static(path.resolve(__dirname, '..', 'css')))
+app.use('/js', express.static(path.resolve(__dirname, '..', 'js')))
+app.use('/vendor', express.static(path.resolve(__dirname, '..', 'vendor')))
 
 var apiConfig = {
 	baseUrl: "https://69433abe-5db8-462f-bf19-9e96fe3f6334:8EVKVhsBGD@twcservice.eu-gb.mybluemix.net/api/weather/v1/"
@@ -196,7 +201,15 @@ var getJSON = function (url) {
 };
 
 app.get('/', function (req, res) {
-  res.sendfile(__dirname + '../monitor.html');
+  res.sendfile(path.resolve(__dirname, '..', 'monitor.html'));
+});
+
+app.get('/configure', function (req, res) {
+  res.sendfile(path.resolve(__dirname, '..', 'setup-manual.html'));
+});
+
+app.get('/subscribe', function (req, res) {
+  res.sendfile(path.resolve(__dirname, '..', 'setup-city.html'));
 });
 
 router.route('/locations')
@@ -343,12 +356,48 @@ router.route('/configure')
 app.use('/api', router);
 
 parts.initialize();
-app.listen(port);
+server.listen(port);
+
+var getSchedule = function () {
+	var data = [];
+
+	for (var i=0; i<=23; i++) {
+		var date = new Date()
+
+		date.setHours(i);
+		date.setMinutes(0);
+		date.setSeconds(0);
+		date.setMilliseconds(0);
+
+		var val = parts.getMatch(parts.temperature.schedule.list, date)
+
+		if (val === null) {
+			data.push({
+				date: date,
+				val: parts.temperature.schedule.default
+			});
+		} else {
+			data.push({
+				date: date,
+				val: val
+			});
+		}
+	}
+
+	return data;
+}
 
 socketio.listen(server).on('connection', function (socket) {
-	socket.on('message', function (msg) {
-		console.log('message received', msg);
-		socket.broadcast.emit('message', msg);
+
+	socket.on('update', function () {
+		socket.broadcast.emit('schedule', {
+			temperature: getSchedule()
+		});
 	})
+
+	socket.emit('schedule', {
+		temperature: getSchedule()
+	});
+
 });
 console.log('Magic happens on port ' + port);

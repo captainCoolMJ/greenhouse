@@ -11,62 +11,161 @@
 			position: relative;
 		}
 
+		input.search__input {
+			width: 100%;
+			display: block;
+			box-sizing: border-box; 
+			padding: 1em;
+			position: relative;
+			margin-bottom: 0;
+		}
+
 		.search__results {
 			display: block;
 			list-style: none;
 			box-shadow: 0 0 4px 0 rgba(0,0,0,0.25);
+			position: absolute;
+			width: 100%;
+			background-color: #FFF;
+			margin: 0;
+			min-height: 50px;
+		}
+
+		.search__results li:nth-child(even) {
+			background-color: #EFEFEF;
 		}
 
 		.search__select {
 			display: block;
-			padding-top: 0.5em;
-			padding-bottom: 0.5em;
+			padding: 0.25em 0.5em;
+		}
+
+		.search__select:hover {
+			background-color: #EFEFEF;
 		}
 
 		/*.search__*/
 	</style>
 </head>
 <body>
-	<div class="search">
-		<h1 class="search__title">Find a City</h1>
+	<div class="container-fluid">
+		<div class="search">
+			<h1 class="search__title">Find a City</h1>
 
-		<input class="search__input" type="search" />
+			<input class="search__input" type="search" />
 
-		<table class="table table-striped search__results">
-			<tr class="search__result row-fluid">
-				<td class="span8">
-					<a href="#" class="search__select">Dubai Marina, UAE - 42<sup>&deg;</sup></a>
-				</td>
-				<td class="span4">
-					42<sup>&deg;</sup>
-				</td>
-			</tr>
-			<tr class="search__result row-fluid">
-				<td class="span8">
-					Dubai Marina, UAE
-				</td>
-				<td class="span4">
-					21<sup>&deg;</sup>
-				</td>
-			</tr>
-		</table>
+			<ul class="search__results list-unstyled">
+			</ul>
+
+			<!-- <table class="table table-striped search__results">
+				<tr class="search__result row-fluid">
+					<td class="span8">
+						<a href="#" class="search__select">Dubai Marina, UAE - 42<sup>&deg;</sup></a>
+					</td>
+				</tr>
+				<tr class="search__result row-fluid">
+					<td class="span8">
+						Dubai Marina, UAE
+					</td>
+				</tr>
+			</table> -->
+		</div>
+
+		<div class="selection">
+			<h2>Dubai</h2>
+
+			<p>42<sup>&deg;</sup></p>
+			<!-- <p>Sunrise: 06:42</p>
+			<p>Sunset: 19:05</p>
+			<p>Humidity: 75%</p> -->
+		</div>
+		
+		<form>
+			<input type="hidden" name="location-id" value="" />
+			<button type="submit" class="btn btn-default">Pair with This Location</button>
+		</form>
 	</div>
-
-	<div class="selection">
-		<h2>Dubai</h2>
-
-		<p>42<sup>&deg;</sup></p>
-		<p>Sunrise: 06:42</p>
-		<p>Sunset: 19:05</p>
-		<p>Humidity: 75%</p>
-	</div>
-	
-	<form>
-		<input type="hidden" name="location-id" value="" />
-		<button type="submit" class="btn">Pair with This Location</button>
-	</form>
 
 	<script src="https://code.jquery.com/jquery-3.2.1.js"></script>
-	<script type="text/javascript" src="vendor/bootstrap/js/bootstrap.js"></script>
+
+	<script>
+
+	var search = {
+		tpl: $('<li><a href="#" data-location-id="" class="search__select"></a></li>'),
+		$container: $('.search'),
+		$input: $('.search__input'),
+		$resultsContainer: $('.search__results'),
+		results: {},
+		_searchDebounce: null,
+		onSearch: function (q) {
+			clearTimeout(search._searchDebounce);
+
+			search.results = {};
+			search.renderHTML();
+			search.$resultsContainer.show();
+
+			search._searchDebounce = setTimeout(function () {
+				search.results = {
+					'1234': {
+						id: '1234',
+						name: 'asdfg',
+						'temperature': '30'
+					}
+				};
+
+				search.renderHTML();
+			}, 500)
+		},
+		onSelect: function (locationId) {
+			selection.setSelection(search.results[locationId]);
+			search.$resultsContainer.hide();
+		},
+		renderHTML: function () {
+			search.$resultsContainer.empty();
+
+			for (var prop in search.results) {
+				var $res = search.tpl.clone();
+
+				$('a', $res)
+					.data('location-id', search.results[prop].id)
+					.text(search.results[prop].name);
+
+				search.$resultsContainer.append($res);
+			}
+		},
+		initialize: function () {
+			search.$resultsContainer.on('click', '.search__select', function (evt) {
+				evt.stopPropagation();
+				evt.preventDefault();
+
+				search.onSelect($(evt.target).data('locationId'))
+			});
+
+			search.$input.on('keyup', function () {
+				search.onSearch(search.$input.val());
+			});
+			
+			search.$resultsContainer.hide();
+		}
+	};
+
+	var selection = {
+		$container: $('.selection'),
+		value: {},
+		setSelection: function (data) {
+			selection.value = data;
+
+			selection.renderHTML();
+		},
+		renderHTML: function () {
+			var $title = $('h2', selection.$container);
+
+			$title.text(selection.value.name);
+		}
+	};
+
+	search.initialize();
+
+	</script>
 </body>
 </html>
