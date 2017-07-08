@@ -1,6 +1,9 @@
 const apiEndPoints = {
     weather: 'http://192.168.255.195:8888/api/weather'
 }
+const config = {
+    defaultTemp: 21
+}
 
 const util = {
     transformRanges: (num, old_list = [0, 1], new_list = [0, 1]) => {
@@ -210,7 +213,7 @@ class GreenhouseMonitor {
             },
             getValue: pos => {
                 if(!this.internalData.temperature) {
-                    return {}
+                    return {val: config.defaultTemp}
                 }
                 return this.internalData.temperature.find(item => {
                     return Math.round(pos) === item.hour
@@ -292,6 +295,9 @@ class GreenhouseMonitor {
             }
             let data
             const pos = util.transformRanges(percentage, [0, 100], [0, 23])
+            if(!pos) {
+                return
+            }
 
             data = this.tempGraph.getValue(pos)
             this.tempGraph.updateMark(data.val)
@@ -303,9 +309,11 @@ class GreenhouseMonitor {
             this.waterGraph.updateMark(data.pop)
         }
         this.slider = {
+            interval: 0,
+            sliderSelector: '',
             init: selector => {
-                this.sliderSelector = selector
-                const currentHour = util.getHour(weatherData.date)
+                this.slider.sliderSelector = selector
+                const currentHour = (new Date()).getHours()//util.getHour(weatherData.date)
                 const currentPos = util.transformRanges(currentHour, [0, 23], [0, 100])
                 this.updateMark(currentPos)
                 $(selector).slider({
@@ -315,8 +323,34 @@ class GreenhouseMonitor {
                     }
                 });
             },
+            getValue() {
+                return $(this.sliderSelector).slider('value')
+            },
             onSliderChange: percentage => {
+                if(!percentage) {
+                    percentage = this.slider.getValue()
+                }
                 this.updateMark(percentage)
+            },
+            startMovement: () => {
+                this.slider.stopMovement()
+                this.slider.interval = setInterval(() => {
+                    this.slider.movement()
+                }, 30 * 60 * 1000)
+            },
+            movement: () => {
+                const currentValue = this.slider.getValue()
+                const currentHour = (new Date()).getHours()
+                const nextValue = util.transformRanges(currentHour, [0, 23], [0, 100])
+                if(currentValue < 100) {
+                    $(this.slider.sliderSelector).slider('value', nextValue)
+                } else if(currentValue >= 100) {
+                    $(this.slider.sliderSelector).slider('value', 0)
+                }
+                this.slider.onSliderChange()
+            },
+            stopMovement: () => {
+                clearInterval(this.slider.interval)
             }
         }
         this.renderer = {
@@ -372,24 +406,25 @@ class GreenhouseMonitor {
     init() {
         google.charts.load('current', {'packages':['corechart']});
         this.render(['temp', 'sunlight', 'water', 'slider'])
+        this.slider.startMovement()
     }
 }
 
 (function($) {
     let greenhouseMonitor
-    if(dummyData) {
+    // if(dummyData) {
         greenhouseMonitor = new GreenhouseMonitor(dummyData)
         greenhouseMonitor.init()
-    } else {
-        $.ajax({
-            dataType: "json",
-            url: apiEndPoints.weather,
-            success: data => {
-                greenhouseMonitor = new GreenhouseMonitor(data)
-                greenhouseMonitor.init()
-            }
-        })
-    }
+    // } else {
+    //     $.ajax({
+    //         dataType: "json",
+    //         url: apiEndPoints.weather,
+    //         success: data => {
+    //             greenhouseMonitor = new GreenhouseMonitor(data)
+    //             greenhouseMonitor.init()
+    //         }
+    //     })
+    // }
 
     var iosocket = io.connect();
 
