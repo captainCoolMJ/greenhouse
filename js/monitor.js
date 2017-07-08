@@ -190,17 +190,17 @@ class GreenhouseMonitor {
                         return prev
                     }, [])
                 }
-                const hoursData = [['Hours', 'External', 'Internal']].concat(weatherData.hours.map((item, index) => {
+                const hoursData = [['Hours', 'Temperature']].concat(weatherData.hours.map((item, index) => {
                     return [
                         this.hours[index],
-                        item.temp,
+                        // item.temp,
                         internalTemp[index] || 0
                     ]
                 }))
                 var data = google.visualization.arrayToDataTable(hoursData);
 
                 var options = {
-                    curveType: 'function',
+                    curveType: 'none',
                     legend: { position: 'bottom' }
                 };
 
@@ -209,9 +209,11 @@ class GreenhouseMonitor {
                 chart.draw(data, options);
             },
             getValue: pos => {
-                return weatherData.hours.find(item => {
-                    const hour = util.getHour(item.time)
-                    return Math.round(pos) === hour
+                if(!this.internalData.temperature) {
+                    return {}
+                }
+                return this.internalData.temperature.find(item => {
+                    return Math.round(pos) === item.hour
                 })
             },
             updateMark: value => {
@@ -285,11 +287,14 @@ class GreenhouseMonitor {
             }
         }
         this.updateMark = percentage => {
+            if(!percentage) {
+                percentage = $(this.sliderSelector).slider('value')
+            }
             let data
             const pos = util.transformRanges(percentage, [0, 100], [0, 23])
 
             data = this.tempGraph.getValue(pos)
-            this.tempGraph.updateMark(data.temp)
+            this.tempGraph.updateMark(data.val)
 
             data = this.sunlightGraph.getValue(pos)
             this.sunlightGraph.updateMark(data)
@@ -299,6 +304,7 @@ class GreenhouseMonitor {
         }
         this.slider = {
             init: selector => {
+                this.sliderSelector = selector
                 const currentHour = util.getHour(weatherData.date)
                 const currentPos = util.transformRanges(currentHour, [0, 23], [0, 100])
                 this.updateMark(currentPos)
@@ -360,6 +366,7 @@ class GreenhouseMonitor {
         })
         this.internalData.temperature = temperature
         this.render(['temp'])
+        this.updateMark()
     }
 
     init() {
