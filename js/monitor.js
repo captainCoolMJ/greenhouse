@@ -276,14 +276,6 @@ var greenhouseMonitor = weatherData => {
         }
     }
 
-    this.onSliderChange = percentage => {
-        
-        this.updateMark(percentage)
-        
-        // const opacity = util.transformRanges(pos, [0, 100], [0, 1])
-        // $('body').css('background-color', `rgba(0,0,0,${opacity})`)
-    }
-
     this.updateMark = percentage => {
         let data
         const pos = util.transformRanges(percentage, [0, 100], [0, 23])
@@ -296,6 +288,23 @@ var greenhouseMonitor = weatherData => {
 
         data = this.waterGraph.getValue(pos)
         this.waterGraph.updateMark(data.pop)
+    }
+
+    this.slider = {
+        init: selector => {
+            const currentHour = util.getHour(weatherData.date)
+            const currentPos = util.transformRanges(currentHour, [0, 23], [0, 100])
+            this.updateMark(currentPos)
+            $(selector).slider({
+                value: currentPos,
+                slide: (event, ui) => {
+                    this.slider.onSliderChange(ui.value)
+                }
+            });
+        },
+        onSliderChange: percentage => {
+            this.updateMark(percentage)
+        }
     }
 
     this.renderer = {
@@ -321,15 +330,7 @@ var greenhouseMonitor = weatherData => {
             });
         },
         slider: () => {
-            const currentHour = util.getHour(weatherData.date)
-            const currentPos = util.transformRanges(currentHour, [0, 23], [0, 100])
-            this.updateMark(currentPos)
-            $( "#slider" ).slider({
-                value: currentPos,
-                slide: (event, ui) => {
-                    this.onSliderChange(ui.value)
-                }
-            });
+            this.slider.init('#slider')
         }
     }
     
