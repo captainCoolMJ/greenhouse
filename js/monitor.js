@@ -18,6 +18,9 @@ const util = {
         return new_num;
       }
     },
+    getHour: dataStr => {
+        return (new Date(dataStr)).getUTCHours()
+    }
 }
 
 const dummyData = {
@@ -173,80 +176,126 @@ const dummyData = {
 }
 
 var greenhouseMonitor = weatherData => {
-    this.hours = weatherData.hours.map(item => (new Date(item.time)).getUTCHours());
+    this.hours = weatherData.hours.map(item => util.getHour(item.time));
 
-    this.drawTempGraph = (node) => {
-        const hoursData = [['Hours', 'External']].concat(weatherData.hours.map((item, index) => {
-            return [
-                this.hours[index],
-                item.temp
-            ]
-        }))
-        var data = google.visualization.arrayToDataTable(hoursData);
+    this.tempGraph = {
+        draw: node => {
+            const hoursData = [['Hours', 'External']].concat(weatherData.hours.map((item, index) => {
+                return [
+                    this.hours[index],
+                    item.temp
+                ]
+            }))
+            var data = google.visualization.arrayToDataTable(hoursData);
 
-        var options = {
-            title: 'Temperature',
-            curveType: 'function',
-            legend: { position: 'bottom' }
-        };
+            var options = {
+                curveType: 'function',
+                legend: { position: 'bottom' }
+            };
 
-        var chart = new google.visualization.LineChart(node);
+            var chart = new google.visualization.LineChart(node);
 
-        chart.draw(data, options);
+            chart.draw(data, options);
+        },
+        getValue: pos => {
+            return weatherData.hours.find(item => {
+                const hour = util.getHour(item.time)
+                return Math.round(pos) === hour
+            })
+        },
+        updateMark: value => {
+            $('#monitor-temp').closest('.item').find('mark').text(value)
+        }
     }
 
-    this.drawSunlightGraph = (node) => {
-        const sunriseHour = (new Date(weatherData.sunrise)).getUTCHours()
-        const sunsetHour = (new Date(weatherData.sunset)).getUTCHours()
+    this.sunlightGraph = {
+        draw: node => {
+            const sunriseHour = util.getHour(weatherData.sunrise)
+            const sunsetHour = util.getHour(weatherData.sunset)
 
-        const hoursData = [['Hours', 'Sunlight']].concat(weatherData.hours.map((item, index) => {
-            const hour = this.hours[index]
-            const isSunThere = (hour >= sunriseHour && hour <= sunsetHour) ? 1 : 0
-            return [
-                hour,
-                isSunThere
-            ]
-        }))
-        var data = google.visualization.arrayToDataTable(hoursData);
+            const hoursData = [['Hours', 'Sunlight']].concat(weatherData.hours.map((item, index) => {
+                const hour = this.hours[index]
+                const isSunThere = (hour >= sunriseHour && hour <= sunsetHour) ? 1 : 0
+                return [
+                    hour,
+                    isSunThere
+                ]
+            }))
+            var data = google.visualization.arrayToDataTable(hoursData);
 
-        var options = {
-            title: 'Sunlight',
-            curveType: 'none',
-            legend: { position: 'bottom' }
-        };
+            var options = {
+                title: 'Sunlight',
+                curveType: 'none',
+                legend: { position: 'bottom' }
+            };
 
-        var chart = new google.visualization.LineChart(node);
+            var chart = new google.visualization.LineChart(node);
 
-        chart.draw(data, options);
+            chart.draw(data, options);
+        },
+        getValue: pos => {
+            const sunriseHour = util.getHour(weatherData.sunrise)
+            const sunsetHour = util.getHour(weatherData.sunset)
+            return (pos >= sunriseHour && pos <= sunsetHour) ? 1 : 0
+        },
+        updateMark: value => {
+            $('#monitor-sunlight').closest('.item').find('mark').text(value ? 'ON' : 'OFF')
+        }
     }
 
-    this.drawWaterGraph = node => {
-        const precipitation = weatherData.pop
+    this.waterGraph = { 
+        draw: node => {
+            const precipitation = weatherData.pop
 
-        const hoursData = [['Hours', 'Raining']].concat(weatherData.hours.map((item, index) => {
-            return [
-                this.hours[index],
-                item.pop >= 80 ? 1 : 0
-            ]
-        }))
-        var data = google.visualization.arrayToDataTable(hoursData);
+            const hoursData = [['Hours', 'Raining']].concat(weatherData.hours.map((item, index) => {
+                return [
+                    this.hours[index],
+                    item.pop >= 80 ? 1 : 0
+                ]
+            }))
+            var data = google.visualization.arrayToDataTable(hoursData);
 
-        var options = {
-            title: 'Water',
-            curveType: 'none',
-            legend: { position: 'bottom' }
-        };
+            var options = {
+                title: 'Water',
+                curveType: 'none',
+                legend: { position: 'bottom' }
+            };
 
-        var chart = new google.visualization.LineChart(node);
+            var chart = new google.visualization.LineChart(node);
 
-        chart.draw(data, options);
+            chart.draw(data, options);
+        },
+        getValue: pos => {
+            return weatherData.hours.find(item => {
+                const hour = util.getHour(item.time)
+                return Math.round(pos) === hour
+            })
+        },
+        updateMark: value => {
+            $('#monitor-water').closest('.item').find('mark').text(value >= 80 ? 'ON' : 'OFF')
+        }
     }
 
     this.onSliderChange = percentage => {
-        const pos = util.transformRanges(percentage, [0, 100], [0, 23])
-        console.log('pos', pos)
+        
+        this.updateMark(percentage)
+        
         // const opacity = util.transformRanges(pos, [0, 100], [0, 1])
         // $('body').css('background-color', `rgba(0,0,0,${opacity})`)
+    }
+
+    this.updateMark = percentage => {
+        let data
+        const pos = util.transformRanges(percentage, [0, 100], [0, 23])
+
+        data = this.tempGraph.getValue(pos)
+        this.tempGraph.updateMark(data.temp)
+
+        data = this.sunlightGraph.getValue(pos)
+        this.sunlightGraph.updateMark(data)
+
+        data = this.waterGraph.getValue(pos)
+        this.waterGraph.updateMark(data.pop)
     }
 
     this.renderer = {
@@ -254,26 +303,27 @@ var greenhouseMonitor = weatherData => {
             const $target = $('#monitor-temp')
             $target.children().remove()
             google.charts.setOnLoadCallback(() => {
-                this.drawTempGraph($target[0])
+                this.tempGraph.draw($target[0])
             });
         },
         sunlight: () => {
             const $target = $('#monitor-sunlight')
             $target.children().remove()
             google.charts.setOnLoadCallback(() => {
-                this.drawSunlightGraph($target[0])
+                this.sunlightGraph.draw($target[0])
             });
         },
         water: () => {
             const $target = $('#monitor-water')
             $target.children().remove()
             google.charts.setOnLoadCallback(() => {
-                this.drawWaterGraph($target[0])
+                this.waterGraph.draw($target[0])
             });
         },
         slider: () => {
-            const currentHour = (new Date(weatherData.date)).getUTCHours()
+            const currentHour = util.getHour(weatherData.date)
             const currentPos = util.transformRanges(currentHour, [0, 23], [0, 100])
+            this.updateMark(currentPos)
             $( "#slider" ).slider({
                 value: currentPos,
                 slide: (event, ui) => {
