@@ -182,7 +182,7 @@ var parser = {
 	}
 };
 
-var getJSON = function (url) {
+var fetchJSON = function (url) {
 	return new Promise(function (resolve, reject) {
 		http.get(url, function (res) {
 			res.setEncoding('utf8');
@@ -214,7 +214,7 @@ app.get('/subscribe', function (req, res) {
 
 router.route('/locations')
 	.get(function (req, res) {
-		getJSON(`https://69433abe-5db8-462f-bf19-9e96fe3f6334:8EVKVhsBGD@twcservice.eu-gb.mybluemix.net/api/weather/v3/location/search?query=${req.query.query}&language=en-US`).then(function (response) {
+		fetchJSON(`https://69433abe-5db8-462f-bf19-9e96fe3f6334:8EVKVhsBGD@twcservice.eu-gb.mybluemix.net/api/weather/v3/location/search?query=${req.query.query}&language=en-UK`).then(function (response) {
 			var locations = [];
 
 			for (var i=0; i<response.location.address.length; i++) {
@@ -241,8 +241,8 @@ router.route('/:latlong/weather')
 		// var longitude = -0.128;
 
 		Promise.all([
-			getJSON(`${apiConfig.baseUrl}/geocode/${latlong[0]}/${latlong[1]}/forecast/daily/3day.json`),
-			getJSON(`${apiConfig.baseUrl}/geocode/${latlong[0]}/${latlong[1]}/forecast/hourly/48hour.json`)
+			fetchJSON(`${apiConfig.baseUrl}/geocode/${latlong[0]}/${latlong[1]}/forecast/daily/3day.json?units=m`),
+			fetchJSON(`${apiConfig.baseUrl}/geocode/${latlong[0]}/${latlong[1]}/forecast/hourly/48hour.json?units=m`)
 		]).then(function (resArr) {
 			var resObj = {}
 
