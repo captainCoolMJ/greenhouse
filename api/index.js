@@ -65,7 +65,7 @@ var parts = {
 			var date = new Date()
 
 			parts.temperature.schedule.do(date);
-			// parts.light.schedule.do(date);
+			parts.light.schedule.do(date);
 			// parts.water.schedule.do(date);
 
 			// console.log('You will see this message every second');
@@ -128,32 +128,29 @@ var parts = {
 	// 		}
 	// 	}
 	// },
-	// light: {
-	// 	value: 0,
-	// 	schedule: {
-	// 		list: {
-	// 			'30-40 * * * *': 1,
-	// 			'41-50 * * * *': 0
-	// 		},
-	// 		default: 0,
-	// 		do: function (date) {
-	// 			var match = parts.getMatch(parts.light.schedule.list, date);
+	light: {
+		value: 0,
+		schedule: {
+			list: {},
+			default: 0,
+			do: function (date) {
+				var match = parts.getMatch(parts.light.schedule.list, date);
 
-	// 			if (match !== null) {
-	// 				parts.light.set(match);
-	// 			}
-	// 		}
-	// 	},
-	// 	get: function () {
-	// 		return parts.light.value;
-	// 	},
-	// 	set: function (value) {
-	// 		if (value !== parts.light.get()) {
-	// 			console.log('setting light to ', value);
-	// 			parts.light.value = value;	
-	// 		}
-	// 	}
-	// }
+				if (match !== null) {
+					parts.light.set(match);
+				}
+			}
+		},
+		get: function () {
+			return parts.light.value;
+		},
+		set: function (value) {
+			if (value !== parts.light.get()) {
+				console.log('setting light to ', value);
+				parts.light.value = value;	
+			}
+		}
+	}
 }
 
 var parser = {
@@ -278,20 +275,19 @@ router.route('/configureBulk')
 
 		parts.temperature.schedule.list = {};
 
+		var sunrise = new Date(req.body.sunrise);
+		var sunset = new Date(req.body.sunset);
+
+		parts.light.schedule.list = {}
+		parts.light.schedule.list[`${sunrise.getMinutes()} ${sunrise.getHours()} * * *`] = 1;
+		parts.light.schedule.list[`${sunset.getMinutes()} ${sunset.getHours()} * * *`] = 1;
+
 		var today = new Date();
 
 		for (var i=0; i<req.body.forecast.length; i++) {
 			var date = new Date(req.body.forecast[i].time);
 
 			var cron = ['*', date.getHours(), '*', '*', '*'];
-
-			/*
-			date.setHours(i);
-			date.setMinutes(0);
-			date.setSeconds(0);
-			date.setMilliseconds(0);
-			 */
-
 			parts.temperature.schedule.list[cron.join(' ')] = req.body.forecast[i].temp;
 		}
 
