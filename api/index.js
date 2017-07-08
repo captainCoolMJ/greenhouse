@@ -3,6 +3,8 @@ var app = express();
 var cors = require('cors')
 var bodyParser = require('body-parser');
 var http = require('https')
+var server = require('http').Server(app);
+var socketio = require('socket.io');
 
 var CronJob = require('cron').CronJob;
 var cronInstance = new (require('cron-converter'))();
@@ -58,8 +60,8 @@ var parts = {
 			var date = new Date()
 
 			parts.temperature.schedule.do(date);
-			parts.light.schedule.do(date);
-			parts.water.schedule.do(date);
+			// parts.light.schedule.do(date);
+			// parts.water.schedule.do(date);
 
 			// console.log('You will see this message every second');
 		}, null, true, 'America/Los_Angeles');
@@ -67,11 +69,8 @@ var parts = {
 	temperature: {
 		value: 0,
 		schedule: {
-			list: {
-				'0-25 * * * *': 40,
-				'47 * * * *': 35
-			},
-			default: 30,
+			list: {},
+			default: 21,
 			do: function (date) {
 				var match = parts.getMatch(parts.temperature.schedule.list, date);
 
@@ -87,69 +86,69 @@ var parts = {
 		},
 		set: function (value) {
 			if (value !== parts.temperature.get()) {
-				console.log('setting temperature to ', value);
+				console.log('setting temperature to', value);
 				parts.temperature.value = value;	
 			}
 		}
 	},
-	water: {
-		value: 0,
-		schedule: {
-			list: {
-				'50-55 * * * *': 1000,
-				'25-30 * * * *': 1000
-			},
-			default: 0,
-			do: function (date) {
-				var match = parts.getMatch(parts.water.schedule.list, date);
+	// water: {
+	// 	value: 0,
+	// 	schedule: {
+	// 		list: {
+	// 			'50-55 * * * *': 1000,
+	// 			'25-30 * * * *': 1000
+	// 		},
+	// 		default: 0,
+	// 		do: function (date) {
+	// 			var match = parts.getMatch(parts.water.schedule.list, date);
 
-				if (match !== null) {
-					parts.water.set(match);
-				}
-			}
-		},
-		get: function () {
-			return parts.water.value;
+	// 			if (match !== null) {
+	// 				parts.water.set(match);
+	// 			}
+	// 		}
+	// 	},
+	// 	get: function () {
+	// 		return parts.water.value;
 
-			// Find current hour
-		},
-		set: function (value) {
-			if (value !== parts.water.get()) {
-				parts.water.value = value;
-				console.log('setting water to ', value);
-				// setTimeout(function () {
-				// 	parts.water.value = 0;
-				// 	console.log('setting water to ', 0);
-				// }, value)
-			}
-		}
-	},
-	light: {
-		value: 0,
-		schedule: {
-			list: {
-				'30-40 * * * *': 1,
-				'41-50 * * * *': 0
-			},
-			default: 0,
-			do: function (date) {
-				var match = parts.getMatch(parts.light.schedule.list, date);
+	// 		// Find current hour
+	// 	},
+	// 	set: function (value) {
+	// 		if (value !== parts.water.get()) {
+	// 			parts.water.value = value;
+	// 			console.log('setting water to ', value);
+	// 			// setTimeout(function () {
+	// 			// 	parts.water.value = 0;
+	// 			// 	console.log('setting water to ', 0);
+	// 			// }, value)
+	// 		}
+	// 	}
+	// },
+	// light: {
+	// 	value: 0,
+	// 	schedule: {
+	// 		list: {
+	// 			'30-40 * * * *': 1,
+	// 			'41-50 * * * *': 0
+	// 		},
+	// 		default: 0,
+	// 		do: function (date) {
+	// 			var match = parts.getMatch(parts.light.schedule.list, date);
 
-				if (match !== null) {
-					parts.light.set(match);
-				}
-			}
-		},
-		get: function () {
-			return parts.light.value;
-		},
-		set: function (value) {
-			if (value !== parts.light.get()) {
-				console.log('setting light to ', value);
-				parts.light.value = value;	
-			}
-		}
-	}
+	// 			if (match !== null) {
+	// 				parts.light.set(match);
+	// 			}
+	// 		}
+	// 	},
+	// 	get: function () {
+	// 		return parts.light.value;
+	// 	},
+	// 	set: function (value) {
+	// 		if (value !== parts.light.get()) {
+	// 			console.log('setting light to ', value);
+	// 			parts.light.value = value;	
+	// 		}
+	// 	}
+	// }
 }
 
 var parser = {
@@ -195,6 +194,10 @@ var getJSON = function (url) {
 		})
 	})
 };
+
+app.get('/', function (req, res) {
+  res.sendfile(__dirname + '../monitor.html');
+});
 
 router.route('/locations')
 	.get(function (req, res) {
@@ -247,6 +250,36 @@ router.route('/:latlong/weather')
 	});
 
 router.route('/configure')
+	.get(function (req, res) {
+		var data = [];
+
+		for (var i=0; i<=23; i++) {
+			var date = new Date()
+
+			date.setHours(i);
+			date.setMinutes(0);
+			date.setSeconds(0);
+			date.setMilliseconds(0);
+
+			var val = parts.getMatch(parts.temperature.schedule.list, date)
+
+			if (val === null) {
+				data.push({
+					date: date,
+					val: parts.temperature.schedule.default
+				});
+			} else {
+				data.push({
+					date: date,
+					val: val
+				});
+			}
+		}
+
+		res.json({
+			dates: data
+		});
+	})
 	.post(function (req, res) {
 		var body = req.body;
 
@@ -261,7 +294,7 @@ router.route('/configure')
 
 		if (body['temp-day-all'] === 'all') {
 			body['temp-day-select'] = '*';
-		} else if (body['temp-day-select'] && body['temp-day-select'].length) {
+		} else if (body['temp-day-select'] && body['temp-day-select'] instanceof Array && body['temp-day-select'].length) {
 			body['temp-day-select'] = body['temp-day-select'].join(',');
 		} else if (body['temp-day-select']) {
 			body['temp-day-select'] = [body['temp-day-select']];
@@ -281,15 +314,26 @@ router.route('/configure')
 
 		if (ttHour !== tfHour) {
 			hrRange = [tfHour, ttHour].join('-');
+		} else {
+			hrRange = '*';
 		}
 
 		if (ttMin !== ttMin) {
 			mnRange = [tfMin, ttHour].join('-');
+		} else {
+			mnRange = '*';
 		}
 
 		var str = [mnRange, hrRange, '*', '*', body['temp-day-select']].join(' ');
 
-		parts.temperature.schedule.list[str] = body['temp'];
+		parts.temperature.schedule.list = {};
+		parts.temperature.schedule.list[[
+			mnRange, 
+			hrRange, 
+			'*', 
+			'*', 
+			body['temp-day-select']
+		].join(' ')] = parseInt(body['temp']);
 
 		res.json({
 			success: true
@@ -300,4 +344,11 @@ app.use('/api', router);
 
 parts.initialize();
 app.listen(port);
+
+socketio.listen(server).on('connection', function (socket) {
+	socket.on('message', function (msg) {
+		console.log('message received', msg);
+		socket.broadcast.emit('message', msg);
+	})
+});
 console.log('Magic happens on port ' + port);

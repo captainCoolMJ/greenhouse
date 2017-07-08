@@ -46,88 +46,94 @@
 			background-color: #E0E0E0;
 			border-color: #B0B0B0;
 		}
+	
+		.row-align-middle {
+			align-items: center;
+		}
+
 	</style>
 </head>
 <body>
 	<div class="container">
-	<form id="temperature-form">
-		<h3>Temperature</h3>
-		
-		<div>
-
+		<form id="temperature-form">
+			<h3>Temperature</h3>
+			
 			<h4>Time</h4>
+			<div class="row row-align-middle">
+				<div class="col-9">
+					<div id="time-range" class="range-slider"></div>
+					<input type="hidden" name="temp-time-from" id="time-range-from">
+					<input type="hidden" name="temp-time-to" id="time-range-to">
+				</div>
 
-			<label>From</label>
-			<div id="time-range" class="range-slider"></div>
-			<input type="hidden" name="temp-time-from" id="time-range-from">
-			<input type="hidden" name="temp-time-to" id="time-range-to">
+				<div class="col-3">
+					<label>Set to</label>
+					<select name="temp">
+						<option value="18">18&deg;</option>
+						<option value="19">19&deg;</option>
+						<option value="20">20&deg;</option>
+						<option value="21">21&deg;</option>
+						<option value="22">22&deg;</option>
+						<option value="23">23&deg;</option>
+					</select>
+				</div>
+			</div>
 
-			<label>Set to</label>
-			<select name="temp">
-				<option value="18">18&deg;</option>
-				<option value="19">19&deg;</option>
-				<option value="20">20&deg;</option>
-				<option value="21">21&deg;</option>
-				<option value="22">22&deg;</option>
-				<option value="23">23&deg;</option>
-			</select>
-		</div>
+			<h4>Repeats</h4>
 
-		<h4>Repeats</h4>
+			<ul class="list-unstyled list-inline">
+				<li>
+					<div class="button button--push">
+						<input type="checkbox" id="all-select" name="temp-all-select" value="all" />
+						<label for="all-select">All</label>
+					</div>
+				</li>
+				<li>
+					<div class="button button--push">
+						<input type="checkbox" id="day-select-0" name="temp-day-select" value="0" />
+						<label for="day-select-0">S</label>
+					</div>
+				</li>
+				<li>
+					<div class="button button--push">
+						<input type="checkbox" id="day-select-1" name="temp-day-select" value="1" />
+						<label for="day-select-1">M</label>
+					</div>
+				</li>
+				<li>
+					<div class="button button--push">
+						<input type="checkbox" id="day-select-2" name="temp-day-select" value="2" />
+						<label for="day-select-2">T</label>
+					</div>
+				</li>
+				<li>
+					<div class="button button--push">
+						<input type="checkbox" id="day-select-3" name="temp-day-select" value="3" />
+						<label for="day-select-3">W</label>
+					</div>
+				</li>
+				<li>
+					<div class="button button--push">
+						<input type="checkbox" id="day-select-4" name="temp-day-select" value="4" />
+						<label for="day-select-4">T</label>
+					</div>
+				</li>
+				<li>
+					<div class="button button--push">
+						<input type="checkbox" id="day-select-5" name="temp-day-select" value="5" />
+						<label for="day-select-5">F</label>
+					</div>
+				</li>
+				<li>
+					<div class="button button--push">
+						<input type="checkbox" id="day-select-6" name="temp-day-select" value="6" />
+						<label for="day-select-6">S</label>
+					</div>
+				</li>
+			</ul>
 
-		<ul class="list-unstyled list-inline">
-			<li>
-				<div class="button button--push">
-					<input type="checkbox" id="all-select" name="temp-all-select" value="all" />
-					<label for="all-select">All</label>
-				</div>
-			</li>
-			<li>
-				<div class="button button--push">
-					<input type="checkbox" id="day-select-0" name="temp-day-select" value="0" />
-					<label for="day-select-0">S</label>
-				</div>
-			</li>
-			<li>
-				<div class="button button--push">
-					<input type="checkbox" id="day-select-1" name="temp-day-select" value="1" />
-					<label for="day-select-1">M</label>
-				</div>
-			</li>
-			<li>
-				<div class="button button--push">
-					<input type="checkbox" id="day-select-2" name="temp-day-select" value="2" />
-					<label for="day-select-2">T</label>
-				</div>
-			</li>
-			<li>
-				<div class="button button--push">
-					<input type="checkbox" id="day-select-3" name="temp-day-select" value="3" />
-					<label for="day-select-3">W</label>
-				</div>
-			</li>
-			<li>
-				<div class="button button--push">
-					<input type="checkbox" id="day-select-4" name="temp-day-select" value="4" />
-					<label for="day-select-4">T</label>
-				</div>
-			</li>
-			<li>
-				<div class="button button--push">
-					<input type="checkbox" id="day-select-5" name="temp-day-select" value="5" />
-					<label for="day-select-5">F</label>
-				</div>
-			</li>
-			<li>
-				<div class="button button--push">
-					<input type="checkbox" id="day-select-6" name="temp-day-select" value="6" />
-					<label for="day-select-6">S</label>
-				</div>
-			</li>
-		</ul>
-
-		<button type="submit" class="btn">Apply</button>
-	</form>
+			<button type="submit" class="btn btn-default">Apply</button>
+		</form>
 	</div>
 	<script src="https://code.jquery.com/jquery-3.2.1.js"></script>
 	<!-- <script type="text/javascript" src="vendor/bootstrap/js/bootstrap.js"></script> -->

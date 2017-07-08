@@ -29,6 +29,31 @@
     <!--<script src="https://d3js.org/d3.v4.min.js"></script>-->
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        $(function(){
+            var iosocket = io.connect();
+            iosocket.on('connect', function () {
+
+                console.log('socket connect');
+                // $('#incomingChatMessages').append($('<li>Connected</li>'));
+                // iosocket.on('message', function(message) {
+                //     $('#incomingChatMessages').append($('<li></li>').text(message));
+                // });
+                // iosocket.on('disconnect', function() {
+                //     $('#incomingChatMessages').append('<li>Disconnected</li>');
+                // });
+            });
+            $('#outgoingChatMessage').keypress(function(event) {
+                if(event.which == 13) {
+                    event.preventDefault();
+                    iosocket.send($('#outgoingChatMessage').val());
+                    $('#incomingChatMessages').append($('<li></li>').text($('#outgoingChatMessage').val()));
+                    $('#outgoingChatMessage').val('');
+                }
+            });
+        });
+    </script>
     <script src="./js/monitor.js"></script>
 </body>
 </html>
