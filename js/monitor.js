@@ -194,7 +194,7 @@ class GreenhouseMonitor {
                     return [
                         this.hours[index],
                         // item.temp,
-                        internalTemp[index] || 0
+                        parseFloat(internalTemp[index]) || 0
                     ]
                 }))
                 var data = google.visualization.arrayToDataTable(hoursData);
