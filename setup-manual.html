@@ -26,8 +26,13 @@
 		}
 
 		.list-inline li {
-			display: inline-block;
-			min-width: 100px;
+			/*display: inline-block;*/
+			/*min-width: 100px;*/
+		}
+
+		.list-repeat-schedule {
+			text-align: center;
+			margin: 0 auto;
 		}
 
 		.button--push { text-align: center; }
@@ -65,6 +70,9 @@
 </head>
 <body>
 	<div class="container-fluid app__wrapper">
+		<h1>Manual Setup</h1>
+		<p class="lead">Configure a custom climate cycle to grow a plant as you see fit.</p>
+
 		<form id="temperature-form">
 			<h3>Temperature</h3>
 			
@@ -91,65 +99,61 @@
 
 			<h4>Repeats</h4>
 
-			<ul class="list-unstyled list-inline row-fluid">
+			<ul class="list-unstyled list-inline row-fluid list-repeat-schedule">
 				<li class="span2">
 					<div class="button button--push">
 						<input type="checkbox" id="all-select" name="temp-all-select" value="all" />
 						<label for="all-select">All</label>
 					</div>
 				</li>
-				<li class="span2">
+				<li class="span1">
 					<div class="button button--push">
 						<input type="checkbox" id="day-select-0" name="temp-day-select" value="0" />
 						<label for="day-select-0">S</label>
 					</div>
 				</li>
-				<li class="span2">
+				<li class="span1">
 					<div class="button button--push">
 						<input type="checkbox" id="day-select-1" name="temp-day-select" value="1" />
 						<label for="day-select-1">M</label>
 					</div>
 				</li>
-				<li class="span2">
+				<li class="span1">
 					<div class="button button--push">
 						<input type="checkbox" id="day-select-2" name="temp-day-select" value="2" />
 						<label for="day-select-2">T</label>
 					</div>
 				</li>
-				<li class="span2">
+				<li class="span1">
 					<div class="button button--push">
 						<input type="checkbox" id="day-select-3" name="temp-day-select" value="3" />
 						<label for="day-select-3">W</label>
 					</div>
 				</li>
-				<li class="span2">
+				<li class="span1">
 					<div class="button button--push">
 						<input type="checkbox" id="day-select-4" name="temp-day-select" value="4" />
 						<label for="day-select-4">T</label>
 					</div>
 				</li>
-				<li class="span2">
+				<li class="span1">
 					<div class="button button--push">
 						<input type="checkbox" id="day-select-5" name="temp-day-select" value="5" />
 						<label for="day-select-5">F</label>
 					</div>
 				</li>
-				<li class="span2">
+				<li class="span1">
 					<div class="button button--push">
 						<input type="checkbox" id="day-select-6" name="temp-day-select" value="6" />
 						<label for="day-select-6">S</label>
 					</div>
 				</li>
-			</ul>
-				
-			<div class="row-fluid row-small">
-				<div class="span6">
-					<p><a href="/" type="submit" class="btn btn-default">Back</a></p>
-				</div>
-				<div class="span6">
+				<li class="span3">
 					<button type="submit" class="btn btn-default">Apply and Begin</button>
-				</div>
-			</div>
+				</li>
+			</ul>
+
+			<p><a href="/" type="submit" class="btn btn-link">Go Back</a></p>
 		</form>
 	</div>
 

@@ -33,23 +33,50 @@
 			min-height: 50px;
 			text-align: left;
 			z-index: 1;
+			padding: 0;
+		}
+
+		.search__results li {
+			list-style: none;
+			margin: 0;
+			padding: 0;
 		}
 
 		.search__results li:nth-child(even) {
-			background-color: #EFEFEF;
+			background-color: rgba(0, 0, 0, 0.03);
 		}
 
 		.search__select {
 			display: block;
-			padding: 0.25em 0.5em;
+			padding: 0.5em 0.75em;
 		}
 
 		.search__select:hover {
-			background-color: #EFEFEF;
+			background-color: rgba(0, 0, 0, 0.03);
 		}
 
 		.form {
-			text-align: left;
+			padding-top: 1em;
+		}
+
+		.selection ul {
+			margin: 0;
+			padding: 0;
+		}
+
+		.selection ul li {
+			margin: 0;
+			padding: 0.25em 0; 
+			list-style: none;
+		}
+
+		.app__wrapper {
+			max-width: 500px;
+		}
+
+		.loading {
+			padding: 1em 0;
+			display: block;
 		}
 
 		/*.form .btn {
@@ -62,29 +89,25 @@
 <body>
 	<div class="container-fluid app__wrapper">
 		<div class="search">
-			<h1 class="search__title">Sync to a City</h1>
+			<h1 class="search__title">Sync with a City</h1>
 
-			<p>Find and sync with any city in the world to match your box to its climate.</p>
-
+			<p class="lead">Find and sync with any city in the world to match your greenhouse to its climate.</p>
+			
 			<input class="search__input" type="search" placeholder="e.g. Barcelona, Spain" />
 
-			<ul class="search__results list-unstyled"></ul>
+			<ul class="search__results" style="display: none;"></ul>
 		</div>
 
-		<div class="selection">
+		<div class="selection" style="display: none;">
+			<span class="loading">Loading...</span>
 		</div>
-				
-		<div class="row-fluid">
-			<div class="span6">
-				<p><a href="/" type="submit" class="btn btn-default">Go Back</a></p>
-			</div>
-			<div class="span6">
-				<form id="pair-form" class="form">
-					<input type="hidden" name="location-id" value="" />
-					<button type="submit" class="btn btn-default" disabled>Apply and Begin</button>
-				</form>
-			</div>
-		</div>
+
+		<form id="pair-form" class="form">
+			<input type="hidden" name="location-id" value="" />
+			<button type="submit" class="btn btn-default" disabled>Apply and Begin</button>
+		</form>
+		
+		<p><a href="/" type="submit" class="btn btn-link">Go Back</a></p>
 	</div>
 
 	<script src="https://code.jquery.com/jquery-3.2.1.js"></script>
@@ -168,14 +191,27 @@
 		$form: $("#pair-form"),
 		$btnSubmit: $('button[type="submit"]'),
 		$container: $('.selection'),
-		$tpl: $('<div><h2></h2> <ul></ul></div>'),
+		$tpl: $(`
+			<div>
+				<h2></h2>
+				<p><strong>Sunrise: </strong> <span class="sunrise"></span></p>
+				<p><strong>Sunset: </strong> <span class="sunset"></span></p>
+
+				<h3>Today's Temperatures</h3>
+				<ul></ul>
+			</div>
+		`),
 		value: {},
 		setSelection: function (data) {
 			selection.value = data;
 
+			selection.$container.show();
+
 			$.get('http://localhost:8888/api/' + [data.latitude, data.longitude].join(',') + '/weather').then(function (response) {
-				selection.value.sunrise = moment(response.sunrise).format('h:mm:ss a');
-				selection.value.sunset = moment(response.sunset).format('h:mm:ss a');
+				selection.value._raw = response;
+
+				selection.value.sunrise = moment(response.sunrise).format('h:mma');
+				selection.value.sunset = moment(response.sunset).format('h:mma');
 
 				selection.value.forecast = response.hours;
 
@@ -196,16 +232,19 @@
 				}
 
 				var $li = $('<li />');
-				$li.text(moment(hour.time).format('h:mm:ss a') + ' - ' + hour.temp + 'º');
+				$li.text(moment(hour.time).format('h:mma') + ' - ' + hour.temp + 'º');
 				$ul.append($li);
 			});
 
 			$title.text(selection.value.name);
 
+			$('.sunrise', $sel).text(selection.value.sunrise);
+			$('.sunset', $sel).text(selection.value.sunset);
+
 			selection.$container.append($sel);
 		},
 		initialize: function () {
-			selection.$container.empty();
+			// selection.$container.empty();
 			selection.$btnSubmit.prop('disabled', true);
 
 			selection.$form.on("submit", function (evt) {
@@ -213,6 +252,8 @@
 				evt.stopPropagation();
 
 				$.post('http://localhost:8888/api/configureBulk', {
+					sunrise: selection.value._raw.sunrise,
+					sunset: selection.value._raw.sunset,
 					forecast: selection.value.forecast
 				}).then(function () {
 					window.location.href = "http://localhost:8888/dashboard"
