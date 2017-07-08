@@ -190,19 +190,38 @@
 		}
 	};
 
-	var $tempForm = $('#temperature-form');
+	// var $tempForm = $('#temperature-form');
 
 	dayRepeat.initialize();
 
-	$tempForm.on('submit', function (evt) {
-		evt.preventDefault();
+	// $tempForm.on('submit', function (evt) {
+	// 	evt.preventDefault();
 
-		$.post('http://localhost:8888/api/configure', $tempForm.serialize());
-		// console.log($form.serialize())
+	// 	$.post('http://localhost:8888/api/configure', $tempForm.serialize());
+	// 	// console.log($form.serialize())
 
-		// $.post()
-	})
+	// 	// $.post()
+	// });
 
 	</script>
+	<script src="/socket.io/socket.io.js"></script>
+    <script>
+        $(function(){
+            var iosocket = io.connect();
+
+            iosocket.on('connect', function () {
+
+				var $tempForm = $('#temperature-form');
+
+				$tempForm.on('submit', function (evt) {
+					evt.preventDefault();
+
+					$.post('http://localhost:8888/api/configure', $tempForm.serialize()).then(function () {
+						iosocket.emit('update');
+					});
+				});
+            });
+        });
+    </script>
 </body>
 </html>

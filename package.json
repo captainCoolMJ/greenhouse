@@ -9,5 +9,8 @@
     "express": "~4.0.0",
     "mongoose": "~3.6.13",
     "socket.io": "^2.0.3"
+  },
+  "devDependencies": {
+    "nodemon": "^1.11.0"
   }
 }
