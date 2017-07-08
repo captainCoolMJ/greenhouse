@@ -39,17 +39,6 @@
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <script src="/socket.io/socket.io.js"></script>
-    <script>
-        $(function(){
-            var iosocket = io.connect();
-
-            iosocket.on('connect', function () {
-                iosocket.on('schedule', function (res) {
-                    console.log(res);
-                });
-            });
-        });
-    </script>
     <script src="./js/monitor.js"></script>
 </body>
 </html>
