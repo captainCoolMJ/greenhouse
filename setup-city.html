@@ -5,8 +5,10 @@
 	<title>Document</title>
 
 	<link rel="stylesheet" type="text/css" href="vendor/bootstrap/css/bootstrap.css">
+    <link rel="stylesheet" href="./css/main.css">
 
 	<style>
+
 		.search {
 			position: relative;
 		}
@@ -29,6 +31,8 @@
 			background-color: #FFF;
 			margin: 0;
 			min-height: 50px;
+			text-align: left;
+			z-index: 1;
 		}
 
 		.search__results li:nth-child(even) {
@@ -44,40 +48,43 @@
 			background-color: #EFEFEF;
 		}
 
+		.form {
+			text-align: left;
+		}
+
+		/*.form .btn {
+			margin: 1em 0;
+		}*/
+
 		/*.search__*/
 	</style>
 </head>
 <body>
-	<div class="container-fluid">
+	<div class="container-fluid app__wrapper">
 		<div class="search">
-			<h1 class="search__title">Find a City</h1>
+			<h1 class="search__title">Sync to a City</h1>
 
-			<input class="search__input" type="search" />
+			<p>Find and sync with any city in the world to match your box to its climate.</p>
 
-			<ul class="search__results list-unstyled">
-			</ul>
+			<input class="search__input" type="search" placeholder="e.g. Barcelona, Spain" />
 
-			<!-- <table class="table table-striped search__results">
-				<tr class="search__result row-fluid">
-					<td class="span8">
-						<a href="#" class="search__select">Dubai Marina, UAE - 42<sup>&deg;</sup></a>
-					</td>
-				</tr>
-				<tr class="search__result row-fluid">
-					<td class="span8">
-						Dubai Marina, UAE
-					</td>
-				</tr>
-			</table> -->
+			<ul class="search__results list-unstyled"></ul>
 		</div>
 
 		<div class="selection">
 		</div>
-		
-		<form id="pair-form">
-			<input type="hidden" name="location-id" value="" />
-			<button type="submit" class="btn btn-default">Pair with This Location</button>
-		</form>
+				
+		<div class="row-fluid">
+			<div class="span6">
+				<p><a href="/" type="submit" class="btn btn-default">Go Back</a></p>
+			</div>
+			<div class="span6">
+				<form id="pair-form" class="form">
+					<input type="hidden" name="location-id" value="" />
+					<button type="submit" class="btn btn-default" disabled>Apply and Begin</button>
+				</form>
+			</div>
+		</div>
 	</div>
 
 	<script src="https://code.jquery.com/jquery-3.2.1.js"></script>
@@ -159,6 +166,7 @@
 
 	var selection = {
 		$form: $("#pair-form"),
+		$btnSubmit: $('button[type="submit"]'),
 		$container: $('.selection'),
 		$tpl: $('<div><h2></h2> <ul></ul></div>'),
 		value: {},
@@ -172,36 +180,7 @@
 				selection.value.forecast = response.hours;
 
 				selection.renderHTML();
-			});
-		},
-		onSubmit: function () {
-			selection.$form.on("submit", function (evt) {
-				evt.preventDefault();
-				evt.stopPropagation();
-
-				window.alert('submit!');
-
-/*
-></div>
-<input type="hidden" name="temp-time-from" id="time-range-from">
-<input type="hidden" name="temp-time-to" id="time-range-to">
-</div>
-
-<div class="col-3">
-<label>Set to</label>
-<select name="temp">
-<option value="18">18&deg;</option>
-<option value="19">19&deg;</option>
-<option value="20">20&deg;</option>
-<option value="21">21&deg;</option>
-<option value="22">22&deg;</option>
-<option value="23">23&deg;</option>	
- */
-				// $.post('http://localhost:8888/api/configureBulk', {
-				// 	forecast: selection.value.forecast
-				// }).then(function () {
-				// 	window.location.href = "http://localhost:8888/"
-				// });
+				selection.$btnSubmit.prop('disabled', false);
 			});
 		},
 		renderHTML: function () {
@@ -227,32 +206,16 @@
 		},
 		initialize: function () {
 			selection.$container.empty();
+			selection.$btnSubmit.prop('disabled', true);
 
 			selection.$form.on("submit", function (evt) {
 				evt.preventDefault();
 				evt.stopPropagation();
 
-/*
-></div>
-<input type="hidden" name="temp-time-from" id="time-range-from">
-<input type="hidden" name="temp-time-to" id="time-range-to">
-</div>
-
-<div class="col-3">
-<label>Set to</label>
-<select name="temp">
-<option value="18">18&deg;</option>
-<option value="19">19&deg;</option>
-<option value="20">20&deg;</option>
-<option value="21">21&deg;</option>
-<option value="22">22&deg;</option>
-<option value="23">23&deg;</option>	
- */
-
 				$.post('http://localhost:8888/api/configureBulk', {
 					forecast: selection.value.forecast
 				}).then(function () {
-					window.location.href = "http://localhost:8888/"
+					window.location.href = "http://localhost:8888/dashboard"
 				});
 			});
 		}

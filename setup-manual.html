@@ -7,6 +7,7 @@
 	<link rel="stylesheet" type="text/css" href="vendor/bootstrap/css/bootstrap.css">
 	<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 	<link rel="stylesheet" href="./css/range-slider.css">
+    <link rel="stylesheet" href="./css/main.css">
 	<style>
 		.search {
 			position: relative;
@@ -51,24 +52,33 @@
 			align-items: center;
 		}
 
+		.select {
+			width: auto;
+		}
+
+		.row-small {
+			width: 300px;
+			margin: 0 auto;
+		}
+
 	</style>
 </head>
 <body>
-	<div class="container-fluid">
+	<div class="container-fluid app__wrapper">
 		<form id="temperature-form">
 			<h3>Temperature</h3>
 			
 			<h4>Time</h4>
 			<div class="row-fluid row-align-middle">
-				<div class="col-9">
+				<div class="span10">
 					<div id="time-range" class="range-slider"></div>
 					<input type="hidden" name="temp-time-from" id="time-range-from">
 					<input type="hidden" name="temp-time-to" id="time-range-to">
 				</div>
 
-				<div class="col-3">
-					<label>Set to</label>
-					<select name="temp">
+				<div class="span2">
+					<label>Maintain at</label>
+					<select name="temp" class="select">
 						<option value="18">18&deg;</option>
 						<option value="19">19&deg;</option>
 						<option value="20">20&deg;</option>
@@ -81,62 +91,69 @@
 
 			<h4>Repeats</h4>
 
-			<ul class="list-unstyled list-inline">
-				<li>
+			<ul class="list-unstyled list-inline row-fluid">
+				<li class="span2">
 					<div class="button button--push">
 						<input type="checkbox" id="all-select" name="temp-all-select" value="all" />
 						<label for="all-select">All</label>
 					</div>
 				</li>
-				<li>
+				<li class="span2">
 					<div class="button button--push">
 						<input type="checkbox" id="day-select-0" name="temp-day-select" value="0" />
 						<label for="day-select-0">S</label>
 					</div>
 				</li>
-				<li>
+				<li class="span2">
 					<div class="button button--push">
 						<input type="checkbox" id="day-select-1" name="temp-day-select" value="1" />
 						<label for="day-select-1">M</label>
 					</div>
 				</li>
-				<li>
+				<li class="span2">
 					<div class="button button--push">
 						<input type="checkbox" id="day-select-2" name="temp-day-select" value="2" />
 						<label for="day-select-2">T</label>
 					</div>
 				</li>
-				<li>
+				<li class="span2">
 					<div class="button button--push">
 						<input type="checkbox" id="day-select-3" name="temp-day-select" value="3" />
 						<label for="day-select-3">W</label>
 					</div>
 				</li>
-				<li>
+				<li class="span2">
 					<div class="button button--push">
 						<input type="checkbox" id="day-select-4" name="temp-day-select" value="4" />
 						<label for="day-select-4">T</label>
 					</div>
 				</li>
-				<li>
+				<li class="span2">
 					<div class="button button--push">
 						<input type="checkbox" id="day-select-5" name="temp-day-select" value="5" />
 						<label for="day-select-5">F</label>
 					</div>
 				</li>
-				<li>
+				<li class="span2">
 					<div class="button button--push">
 						<input type="checkbox" id="day-select-6" name="temp-day-select" value="6" />
 						<label for="day-select-6">S</label>
 					</div>
 				</li>
 			</ul>
-
-			<button type="submit" class="btn btn-default">Apply</button>
+				
+			<div class="row-fluid row-small">
+				<div class="span6">
+					<p><a href="/" type="submit" class="btn btn-default">Back</a></p>
+				</div>
+				<div class="span6">
+					<button type="submit" class="btn btn-default">Apply and Begin</button>
+				</div>
+			</div>
 		</form>
 	</div>
+
 	<script src="https://code.jquery.com/jquery-3.2.1.js"></script>
-	<!-- <script type="text/javascript" src="vendor/bootstrap/js/bootstrap.js"></script> -->
 	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 	<script src="./js/range-slider.js"></script>
 	<script>
@@ -150,9 +167,6 @@
 				isChecked: $(el).is(':checked')
 			};
 		}),
-		set: function () {
-
-		},
 		renderHTML: function (action) {
 			if (action === 'days') {
 				dayRepeat.days.forEach(function (day) {
@@ -190,18 +204,7 @@
 		}
 	};
 
-	// var $tempForm = $('#temperature-form');
-
 	dayRepeat.initialize();
-
-	// $tempForm.on('submit', function (evt) {
-	// 	evt.preventDefault();
-
-	// 	$.post('http://localhost:8888/api/configure', $tempForm.serialize());
-	// 	// console.log($form.serialize())
-
-	// 	// $.post()
-	// });
 
 	</script>
 	<script src="/socket.io/socket.io.js"></script>
@@ -218,6 +221,7 @@
 
 					$.post('http://localhost:8888/api/configure', $tempForm.serialize()).then(function () {
 						iosocket.emit('update');
+						window.location.href = 'http://localhost:8888/dashboard';
 					});
 				});
             });

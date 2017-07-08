@@ -201,14 +201,18 @@ var fetchJSON = function (url) {
 };
 
 app.get('/', function (req, res) {
+  res.sendfile(path.resolve(__dirname, '..', 'index.html'));
+});
+
+app.get('/dashboard', function (req, res) {
   res.sendfile(path.resolve(__dirname, '..', 'monitor.html'));
 });
 
-app.get('/configure', function (req, res) {
+app.get('/setup', function (req, res) {
   res.sendfile(path.resolve(__dirname, '..', 'setup-manual.html'));
 });
 
-app.get('/subscribe', function (req, res) {
+app.get('/sync', function (req, res) {
   res.sendfile(path.resolve(__dirname, '..', 'setup-city.html'));
 });
 
